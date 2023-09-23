@@ -1,95 +1,75 @@
+'use client'
 import Image from 'next/image'
 import styles from './page.module.css'
+import { useState, useEffect, FormEvent } from 'react'
+
+import Link from 'next/link';
+import { Col, Container, Row } from 'react-bootstrap';
 
 export default function Home() {
+  const [isClient, setIsClient] = useState(false)
+  const [res, setRes] = useState('');
+
+  useEffect(() => {
+    setIsClient(true)
+  }, [])
+
+
+  async function submitForm(e){
+    e.preventDefault();
+    // const formData = new FormData(e.currentTarget)
+
+    const data = {
+      title: e.target.post_title.value,
+      content: e.target.post_content.value
+    }
+
+    try {
+        // const api_endpoint = "http://wp-nextjs-crud.test/wp-json/noman/v1/create-post";
+      const res = await fetch("https://app.wprealizer.com/wp-json/noman/v1/create-post", {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+          },
+        body: JSON.stringify(data)
+        })
+
+        if (!res.ok) {
+          throw new Error('Something wrong');
+        }
+
+        // retrive api data
+        const resData = await res.json();
+        console.log(resData);
+    }
+    catch (error) {
+      console.error(error)
+    }
+    
+    
+  }
   return (
-    <main className={styles.main}>
-      <div className={styles.description}>
-        <p>
-          Get started by editing&nbsp;
-          <code className={styles.code}>src/app/page.js</code>
-        </p>
-        <div>
-          <a
-            href="https://vercel.com?utm_source=create-next-app&utm_medium=appdir-template&utm_campaign=create-next-app"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            By{' '}
-            <Image
-              src="/vercel.svg"
-              alt="Vercel Logo"
-              className={styles.vercelLogo}
-              width={100}
-              height={24}
-              priority
-            />
-          </a>
-        </div>
-      </div>
+    <>
 
-      <div className={styles.center}>
-        <Image
-          className={styles.logo}
-          src="/next.svg"
-          alt="Next.js Logo"
-          width={180}
-          height={37}
-          priority
-        />
-      </div>
+      <Container>
+        <Row className='justify-content-center'>
+          <Col lg={8}>
+            <h1 className='my-5'>NextJS WP CRUD</h1>
+            <form onSubmit={submitForm}>
+                <div className="mb-3">
+                <label for="exampleFormControlInput1" className="form-label">Email address</label>
+                <input type="text" name='post_title' className="form-control" id="exampleFormControlInput1" placeholder="Post Title"/>
+              </div>
+              <div className="mb-3">
+                <label for="exampleFormControlTextarea1" className="form-label">Post Content</label>
+                <textarea className="form-control" name='post_content' id="exampleFormControlTextarea1" rows="3"></textarea>
+              </div>
+              <input type='submit' value="Submit" className='btn btn-primary'/>
+            </form>
+          </Col>
+        </Row>
+      </Container>
 
-      <div className={styles.grid}>
-        <a
-          href="https://nextjs.org/docs?utm_source=create-next-app&utm_medium=appdir-template&utm_campaign=create-next-app"
-          className={styles.card}
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          <h2>
-            Docs <span>-&gt;</span>
-          </h2>
-          <p>Find in-depth information about Next.js features and API.</p>
-        </a>
-
-        <a
-          href="https://nextjs.org/learn?utm_source=create-next-app&utm_medium=appdir-template&utm_campaign=create-next-app"
-          className={styles.card}
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          <h2>
-            Learn <span>-&gt;</span>
-          </h2>
-          <p>Learn about Next.js in an interactive course with&nbsp;quizzes!</p>
-        </a>
-
-        <a
-          href="https://vercel.com/templates?framework=next.js&utm_source=create-next-app&utm_medium=appdir-template&utm_campaign=create-next-app"
-          className={styles.card}
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          <h2>
-            Templates <span>-&gt;</span>
-          </h2>
-          <p>Explore the Next.js 13 playground.</p>
-        </a>
-
-        <a
-          href="https://vercel.com/new?utm_source=create-next-app&utm_medium=appdir-template&utm_campaign=create-next-app"
-          className={styles.card}
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          <h2>
-            Deploy <span>-&gt;</span>
-          </h2>
-          <p>
-            Instantly deploy your Next.js site to a shareable URL with Vercel.
-          </p>
-        </a>
-      </div>
-    </main>
+    </>
   )
 }
